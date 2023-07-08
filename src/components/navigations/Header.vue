@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center justify-between w-full px-5">
+  <div class="flex items-center justify-between w-full px-10">
     <Logo />
     <div class="text-lg flex gap-5">
       <span
