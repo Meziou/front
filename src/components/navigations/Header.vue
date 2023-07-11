@@ -29,6 +29,10 @@ export default {
         {
           label: "About",
           name: "about"
+        },
+        {
+          label: "Entity",
+          name: "newEntity"
         }
       ]
     }
