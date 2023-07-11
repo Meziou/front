@@ -23,16 +23,17 @@
               <div class="p-8">
                 <div class="uppercase tracking-wide text-sm text-indigo-500 font-bold">{{ entity.name }}</div>
                 <a 
-                  href="#"
+                  href="#" 
                   class="block mt-1 text-l leading-tight font-semibold hover:underline">{{ entity.type }}</a>
                 <p class="mt-2 text-gray-500">Value: {{ entity.value }}</p>
                 <p class="mt-2 text-gray-500">Status: {{ entity.status }}</p>
+                <button @click="playText(entity)">⏯️</button>
               </div>
             </div>
           </div>
-
         </li>
       </ul>
+
     </div>
   </div>
 </template>
@@ -67,6 +68,12 @@ export default {
         .finally(() => {
           this.isLoading = false
         })
+    },
+    playText(entity) {
+      const text = `entity ${entity.name} is actualy ${entity.status}.`
+      const speech = new SpeechSynthesisUtterance(text)
+      speech.lang = "en-EN"
+      speechSynthesis.speak(speech)
     }
   }
 }
