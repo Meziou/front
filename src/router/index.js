@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router"
 import About from "@/components/about/About.vue"
-import Dashboard from "@/components/dashboard/Dashboard.vue"
 import addEntity from "@/components/addEntity/addEntity.vue"
+import Dashboard from "@/components/dashboard/Dashboard.vue"
 import Home from "@/views/Home.vue"
 
 
@@ -27,6 +27,11 @@ const routes = [
         name: "newEntity",
         component: addEntity
       }
+      // {
+      //   path: "/rooms",
+      //   name: "rooms",
+      //   component: Rooms
+      // }
     ]
   },
   {

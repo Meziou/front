@@ -5,26 +5,25 @@
     </span>
   </div>
   <div class="container mx-auto px-4">
-    <div 
-      class="flex flex-col gap-5"
-      style="@/assets/images/parallax.jpg">
-      <ul class="grid grid-rows-3 grid-flow-col gap-10">
+    <div class="flex justify-center">
+      <ul class="grid gap-4 row-gap-5 sm:grid-cols-2 lg:grid-cols-3">
         <li 
-          v-for="entity in entities" 
+          v-for="entity in entities"
           :key="entity.id">
-          <div class="max-w-md mx-auto bg-white rounded-xl overflow-hidden shadow-md">
-            <div class="md:flex">
+          <div class="h-full mx-auto bg-white rounded-xl overflow-hidden shadow-md border border-black flex p-4">
+            <div class="xl:flex text-center">
               <div class="md:flex-shrink-0">
                 <img 
-                  class="h-48 w-full object-cover md:w-48" 
+                  class="h-48 w-10/12 sm:w-48 mx-auto my-4 sm:mx-auto" 
                   src="https://media.istockphoto.com/id/135843207/fr/photo/house-au-cr%C3%A9puscule.jpg?s=612x612&w=0&k=20&c=weaZvHADj7gX_9lCpvSU9o0fxT3FIJW3pEQ4PZxTbgw=" 
                   alt="Card image">
               </div>
               <div class="p-8">
-                <div class="uppercase tracking-wide text-sm text-indigo-500 font-bold">{{ entity.name }}</div>
+                <div class="uppercase tracking-wide text-sm text-indigo-500 font-bold">{{ entity.room }}</div>
                 <a 
                   href="#" 
-                  class="block mt-1 text-l leading-tight font-semibold hover:underline">{{ entity.type }}</a>
+                  class="block mt-1 text-l leading-tight font-semibold hover:underline">{{ entity.name }}</a>
+                <p class="mt-2 text-gray-500">Type: {{ entity.type }}</p>
                 <p class="mt-2 text-gray-500">Value: {{ entity.value }}</p>
                 <p class="mt-2 text-gray-500">Status: {{ entity.status }}</p>
                 <button @click="playText(entity)">⏯️</button>
@@ -73,6 +72,7 @@ export default {
       const text = `entity ${entity.name} is actualy ${entity.status}.`
       const speech = new SpeechSynthesisUtterance(text)
       speech.lang = "en-EN"
+      speech.rate = 0.6
       speechSynthesis.speak(speech)
     }
   }

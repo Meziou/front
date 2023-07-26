@@ -27,12 +27,12 @@ export default {
           name: "dashboard"
         },
         {
-          label: "About",
-          name: "about"
-        },
-        {
           label: "Entity",
           name: "newEntity"
+        },
+        {
+          label: "About",
+          name: "about"
         }
       ]
     }

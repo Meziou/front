@@ -22,6 +22,7 @@
             <th class="px-12 py-8 md:px-6">Status</th>
             <th class="px-12 py-8 md:px-6">Value</th>
             <th class="px-12 py-8 md:px-6">Created at:</th>
+            <th class="px-12 py-8 md:px-6">Room</th>
             <th class="px-12 py-8 md:px-6">Action</th>
           </tr>
         </thead>
@@ -34,6 +35,7 @@
             <td class="px-12 py-8 md:px-6">{{ entity.status }}</td>
             <td class="px-12 py-8 md:px-6">{{ entity.value }}</td>
             <td class="px-12 py-8 md:px-6">{{ entity.created_at }}</td>
+            <td class="px-12 py-8 md:px-6">{{ entity.room }}</td> 
             <td class="px-12 py-8 md:px-6">
               <div class="btn-group">
                 <button 
@@ -58,7 +60,7 @@
           v-if="showAddModal" 
           class="fixed inset-0 flex items-center justify-center z-50">
           <div class="absolute inset-0 bg-gray-900 opacity-75"></div>
-          <div cclass="relative bg-white rounded-lg p-8 md:max-w-sm">
+          <div class="relative bg-white rounded-lg p-8 md:max-w-sm">
             <form 
               @submit.prevent="createEntity" 
               class="space-y-4">
@@ -104,6 +106,17 @@
                   class="block font-semibold text-gray-700">Value</label>
                 <input 
                   v-model="newEntity.value" 
+                  type="text" 
+                  id="value" 
+                  class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-indigo-500" 
+                  required>
+              </div>
+              <div>
+                <label 
+                  for="room" 
+                  class="block font-semibold text-gray-700">Room</label>
+                <input 
+                  v-model="newEntity.room"
                   type="text" 
                   id="value" 
                   class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-indigo-500" 
@@ -178,6 +191,17 @@
                   required>
               </div>
               <div>
+                <label 
+                  for="update-value" 
+                  class="block font-semibold text-gray-700">Room</label>
+                <input 
+                  v-model="updateEntityData.room" 
+                  type="text" 
+                  id="update-value" 
+                  class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-indigo-500" 
+                  required>
+              </div>
+              <div>
                 <button 
                   type="submit" 
                   class="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded">Update Entity</button>
@@ -195,17 +219,18 @@
 </template>
 <script>
 import coreApi from "@/providers/core-api"
-import axios from "axios"
 
 export default {
   name: "addEntity",
   created() {
     this.getEntities()
+    this.getRooms()
   },
   data() {
     return {
       showAddModal: false,
       entities: [],
+      rooms: [],
       isLoading: false,
       isError: false,
       newEntity: {
@@ -240,9 +265,26 @@ export default {
           this.isLoading = false
         })
     },
+    getRooms() {
+      // Méthode pour récupérer la liste des chambres depuis l'API
+      this.isLoading = true 
+      coreApi.glados.getRooms()
+        .then((rooms) => {
+          this.rooms = rooms
+        })
+        .catch((error) => {
+          console.error(error)
+          this.isError = true
+        })
+        .finally(() => {
+          this.isLoading = false
+        })
+    },
     createEntity() {
-      const { name, type, status, value } = this.newEntity
-      if (!name || !type || !status || !value) {
+      const {
+        name, type, status, value, room
+      } = this.newEntity
+      if (!name || !type || !status || !value || !room) {
         console.error("Tous les champs doivent être remplis.")
         return
       }
@@ -251,26 +293,63 @@ export default {
         type,
         status,
         value,
+        room,
         created_at: new Date().toISOString()
       }
-      axios.post("http://localhost:5001/entities", newEntityData)
+      console.log(coreApi.glados)
+      coreApi.glados.createEntity(newEntityData)
         .then((response) => {
           console.log("La nouvelle entité a été créée :", response)
           this.newEntity = {
             name: "",
             type: "",
             status: "",
-            value: ""
+            value: "",
+            room: ""
           }
           this.getEntities()
+          this.showAddModal = false
         })
         .catch((error) => {
           console.error("Erreur lors de la création de l'entité :", error)
         })
     },
+    updateEntity() {
+      const {
+        id, name, type, status, value
+      } = this.updateEntityData
+      if (!name || !type || !status || !value) {
+        console.error("Tous les champs doivent être remplis.")
+        return
+      }
+      const updatedEntityData = {
+        id,
+        name,
+        type,
+        status,
+        value,
+        updated_at: new Date().toISOString()
+      }
+      coreApi.glados.updateEntity(id, updatedEntityData)
+        .then((response) => {
+          console.log("L'entité a été mise à jour :", response)
+          this.isUpdateFormVisible = false
+          this.updateEntityData = {
+            id: null,
+            name: "",
+            type: "",
+            status: "",
+            value: "",
+            room: ""
+          }
+          this.getEntities()
+        })
+        .catch((error) => {
+          console.error("Erreur lors de la mise à jour de l'entité :", error)
+        })
+    },
     deleteEntity(entityId) {
-      axios
-        .delete(`http://localhost:5001/entities/${entityId}`)
+      coreApi.glados.deleteEntity(entityId)
         .then((response) => {
           console.log("L'entité a été supprimée :", response)
           this.getEntities()
@@ -298,38 +377,6 @@ export default {
         status: "",
         value: ""
       }
-    },
-    updateEntity() {
-      const { id, name, type, status, value } = this.updateEntityData
-      if (!name || !type || !status || !value) {
-        console.error("Tous les champs doivent être remplis.")
-        return
-      }
-      const updatedEntityData = {
-        id,
-        name,
-        type,
-        status,
-        value,
-        updated_at: new Date().toISOString()
-      }
-      axios
-        .put(`http://localhost:5001/entities/${id}`, updatedEntityData)
-        .then((response) => {
-          console.log("L'entité a été mise à jour :", response)
-          this.showUpdateForm = false
-          this.updateEntityData = {
-            id: null,
-            name: "",
-            type: "",
-            status: "",
-            value: ""
-          }
-          this.getEntities()
-        })
-        .catch((error) => {
-          console.error("Erreur lors de la mise à jour de l'entité :", error)
-        })
     }
   }
 }
